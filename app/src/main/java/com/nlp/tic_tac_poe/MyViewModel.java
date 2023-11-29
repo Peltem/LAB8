@@ -21,6 +21,9 @@ public class MyViewModel extends ViewModel {
     public void setText(List<Study> input){
         text.setValue(input);
     }
+    public void postList(List<Study> list) {
+        text.postValue(list);
+    }
     public LiveData<List<Study>> getText(){
         return text;
     }

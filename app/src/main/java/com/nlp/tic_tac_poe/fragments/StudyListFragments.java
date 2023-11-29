@@ -43,31 +43,22 @@ public class StudyListFragments extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentStudyListBinding.inflate(inflater, container, false);
+        viewModel = new ViewModelProvider(requireActivity()).get(MyViewModel.class);
+        viewModel.getText().observe(getViewLifecycleOwner(), new Observer<List<Study>>() {
+            @Override
+            public void onChanged(List<Study> list) {
+                studyListInit(requireActivity(), requireContext(), list);
+                binding.progres.setVisibility(View.GONE);
+                binding.studyList.setVisibility(View.VISIBLE);
+            }
+        });
+
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(MyViewModel.class);
-        viewModel.getText().observe(getViewLifecycleOwner(), new Observer<List<Study>>() {
-            @Override
-            public void onChanged(List<Study> list) {
-                Thread thread = new Thread(() -> {
-                    studyListInit(requireActivity(), requireContext(), list);
-                    try {
-                        Thread.sleep(2500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    requireActivity().runOnUiThread(() -> {
-                        view.findViewById(R.id.progres).setVisibility(View.GONE);
-                        view.findViewById(R.id.study_list).setVisibility(View.VISIBLE);
-                    });
-                });
-                thread.start();
-            }
-        });
         FragmentActivity activity = requireActivity();
         Context context = requireContext();
         addStudyBtnInit();
@@ -78,13 +69,13 @@ public class StudyListFragments extends Fragment {
     private void studyListInit(FragmentActivity activity, Context context, List<Study> list) {
         if (studyAdapter == null) {
             studyAdapter = new StudyAdapter(
-                    getContext(),
+                    context,
                     R.layout.list_item,
                     list);
         }
         binding.studyList.setAdapter(studyAdapter);
         binding.studyList.setOnItemClickListener((adapterView, view, i, l) -> {
-            Toast.makeText(getContext(), String.valueOf(i), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, String.valueOf(i), Toast.LENGTH_LONG).show();
 //            requireActivity().getSupportFragmentManager()
 //                    .beginTransaction()
 //                    .replace(R.id.main_fragment, StudyInfoDialog.getInstance(studyAdapter.getItem(i)))

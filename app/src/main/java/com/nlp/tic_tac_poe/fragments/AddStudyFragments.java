@@ -9,16 +9,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.nlp.tic_tac_poe.MyViewModel;
 import com.nlp.tic_tac_poe.R;
 import com.nlp.tic_tac_poe.adapters.StudyAdapter;
 import com.nlp.tic_tac_poe.Study;
 import com.nlp.tic_tac_poe.databinding.FragmentAddStudyBinding;
 
+import java.util.List;
 import java.util.Random;
 
 public class AddStudyFragments extends Fragment {
     FragmentAddStudyBinding binding;
+    private MyViewModel viewModel;
+
     public AddStudyFragments(){
 
     }
@@ -30,6 +35,7 @@ public class AddStudyFragments extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAddStudyBinding.inflate(inflater, container, false);
+        viewModel = new ViewModelProvider(requireActivity()).get(MyViewModel.class);
         return binding.getRoot();
     }
 
@@ -49,7 +55,9 @@ public class AddStudyFragments extends Fragment {
                     study, random.nextInt(Study.ClassroomNumbers.length));
 
             StudyListFragments.studyList.add(study);
-
+            List<Study> list = viewModel.getText().getValue();
+            list.add(study);
+            viewModel.postList(list);
 
             getActivity().getSupportFragmentManager().popBackStack();
         });
